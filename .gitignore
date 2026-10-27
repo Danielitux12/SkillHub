@@ -1,0 +1,59 @@
+## Build and compilation artifacts
+bin/
+obj/
+out/
+dist/
+
+## Node / Angular
+node_modules/
+.angular/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+## Visual Studio / Roslyn / MSBuild
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+## JetBrains Rider / IntelliJ
+.idea/
+*.DotSettings.user
+
+## Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+## Environment & Secrets
+.env
+.env.*
+!.env.example
+*.local.json
+appsettings.*.local.json
+
+## Testing & Code Coverage
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+## Database / Local Data
+*.db
+*.sqlite
+*.sqlite3
+
+## OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+
+## Logs
+*.log
+logs/
