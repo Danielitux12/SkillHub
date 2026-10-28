@@ -69,3 +69,31 @@ public class ChangePasswordViewModel
     public string ConfirmPassword { get; set; } = string.Empty;
 }
 
+public class ProfileViewModel
+{
+    public Guid UserId { get; set; }
+
+    [Display(Name = "Correo Electrónico")]
+    public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "El nombre completo es obligatorio.")]
+    [StringLength(150, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 150 caracteres.")]
+    [Display(Name = "Nombre Completo")]
+    public string FullName { get; set; } = string.Empty;
+
+    [Phone(ErrorMessage = "Ingrese un número de teléfono válido.")]
+    [Display(Name = "Teléfono de Contacto")]
+    public string? PhoneNumber { get; set; }
+
+    [Display(Name = "Rol en el Sistema")]
+    public string Role { get; set; } = string.Empty;
+
+    [Display(Name = "Especialidad")]
+    public string? Specialty { get; set; }
+
+    public int ActiveEnrollmentsCount { get; set; }
+    public int TotalWorkshopsTaughtCount { get; set; }
+    public bool IsEmployee { get; set; }
+}
+
+

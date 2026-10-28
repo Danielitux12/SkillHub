@@ -95,9 +95,15 @@
                                         </h6>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" && ViewContext.RouteData.Values["action"]?.ToString() == "Profile" ? "active" : "")"
+                                           asp-controller="Account" asp-action="Profile">
+                                            <i class="bi bi-person-gear text-primary me-2"></i> Mi Perfil
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" && ViewContext.RouteData.Values["action"]?.ToString() == "ChangePassword" ? "active" : "")"
                                            asp-controller="Account" asp-action="ChangePassword">
-                                            <i class="bi bi-key-fill text-primary me-2"></i> Cambiar Contraseña
+                                            <i class="bi bi-key-fill text-secondary me-2"></i> Cambiar Contraseña
                                         </a>
                                     </li>
                                     @if (User.IsParticipant())
