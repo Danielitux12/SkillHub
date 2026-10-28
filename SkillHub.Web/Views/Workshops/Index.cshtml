@@ -24,13 +24,13 @@
     }
 </div>
 
-<!-- Barra de Búsqueda (Sin el filtro que no funcionaba) -->
+<!-- Barra de Búsqueda -->
 <div class="card shadow-sm border-0 mb-4 filter-card">
     <div class="card-body p-2 p-md-3">
         <form asp-action="Index" method="get" class="row g-2 align-items-center">
             <div class="col-12 col-md-9 col-lg-10">
                 <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0">
+                    <span class="input-group-text border-end-0">
                         <i class="bi bi-search text-muted"></i>
                     </span>
                     <input type="text" 
@@ -61,7 +61,7 @@
 {
     <div class="card shadow-sm border-0 text-center py-5">
         <div class="card-body py-5">
-            <div class="d-inline-flex p-3 rounded-circle bg-light text-muted mb-3 border">
+            <div class="d-inline-flex p-3 rounded-circle text-muted mb-3 border">
                 <i class="bi bi-calendar-x display-4 text-primary opacity-75"></i>
             </div>
             <h4 class="fw-bold text-dark">No se encontraron talleres</h4>
@@ -105,7 +105,7 @@ else
 
                         <!-- Título y Descripción -->
                         <h5 class="card-title fw-bold text-dark mb-2">
-                            <a asp-action="Details" asp-route-id="@workshop.Id" class="text-decoration-none text-dark hover-primary">
+                            <a asp-action="Details" asp-route-id="@workshop.Id" class="text-decoration-none text-dark">
                                 @workshop.Title
                             </a>
                         </h5>
@@ -148,7 +148,7 @@ else
                     </div>
 
                     <!-- Footer con Botón de Acción -->
-                    <div class="card-footer bg-white border-0 px-4 pb-4 pt-0">
+                    <div class="card-footer border-0 px-4 pb-4 pt-0">
                         <a asp-action="Details" asp-route-id="@workshop.Id" class="btn btn-outline-primary w-100 d-flex justify-content-between align-items-center">
                             <span>Ver Información y Cupo</span>
                             <i class="bi bi-arrow-right"></i>

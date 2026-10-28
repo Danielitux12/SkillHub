@@ -17,7 +17,7 @@
                 SkillHub conecta instructores y participantes en talleres cortos de alto impacto. Control de cupos en tiempo real, prevención de conflictos de horario y certificados oficiales en PDF.
             </p>
             <div class="d-flex flex-wrap gap-3 pt-2">
-                <a asp-controller="Workshops" asp-action="Index" class="btn btn-warning btn-lg px-4 shadow">
+                <a asp-controller="Workshops" asp-action="Index" class="btn btn-primary btn-lg px-4 shadow">
                     <i class="bi bi-grid-fill me-2"></i> Explorar Catálogo
                 </a>
                 @if (User.Identity?.IsAuthenticated != true)
@@ -85,7 +85,7 @@
     <div class="row g-4 row-cols-1 row-cols-lg-3">
         <div class="col">
             <div class="feature-box h-100">
-                <div class="feature-icon-circle feature-icon-indigo">
+                <div class="feature-icon-circle feature-icon-orange">
                     <i class="bi bi-shield-check"></i>
                 </div>
                 <h5 class="fw-bold text-dark mb-2">Aforo y Solapamiento</h5>
@@ -114,47 +114,6 @@
                 <p class="text-muted small mb-0" style="line-height: 1.6;">
                     Importación ágil de participantes desde hojas de cálculo (.xlsx) con ClosedXML para coordinadores y personal administrativo.
                 </p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Tarjeta de Credenciales de Prueba -->
-<div class="card border-0 shadow-sm overflow-hidden mb-4">
-    <div class="card-header bg-dark text-white py-3 px-4 d-flex justify-content-between align-items-center">
-        <div class="fw-bold d-flex align-items-center gap-2">
-            <i class="bi bi-key-fill text-warning"></i>
-            <span>Credenciales Semilla para Pruebas en Vivo</span>
-        </div>
-        <span class="badge bg-secondary font-monospace">Entorno Local</span>
-    </div>
-    <div class="card-body p-4 bg-white">
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="p-3 rounded-3 bg-light border">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="fw-bold text-primary"><i class="bi bi-shield-lock-fill me-1"></i> Rol Empleado / Staff</span>
-                        <span class="badge bg-primary text-white">Administrador</span>
-                    </div>
-                    <p class="text-muted small mb-2">Permite crear nuevos talleres, ver participantes y descargar reportes.</p>
-                    <div class="p-2 bg-white rounded border small font-monospace">
-                        <div><strong>Email:</strong> <code>empleado@skillhub.com</code></div>
-                        <div><strong>Password:</strong> <code>Password123!</code></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="p-3 rounded-3 bg-light border">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="fw-bold text-success"><i class="bi bi-person-check-fill me-1"></i> Rol Participante</span>
-                        <span class="badge bg-success text-white">Estudiante</span>
-                    </div>
-                    <p class="text-muted small mb-2">Permite inscribirse a talleres, cancelar cupos y descargar constancias en PDF.</p>
-                    <div class="p-2 bg-white rounded border small font-monospace">
-                        <div><strong>Email:</strong> <code>maria.rodriguez@skillhub.com</code> (o registrar nuevo)</div>
-                        <div><strong>Password:</strong> <code>Password123!</code></div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

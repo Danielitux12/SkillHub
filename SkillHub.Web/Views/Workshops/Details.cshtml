@@ -77,7 +77,7 @@
 
         <!-- Instructor Responsable -->
         <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-white py-3 px-4 border-0">
+            <div class="card-header py-3 px-4 border-0">
                 <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-person-badge text-primary me-2"></i>Instructor Asignado</h5>
             </div>
             <div class="card-body pt-0 px-4 pb-4">
@@ -98,7 +98,7 @@
     <!-- Barra Lateral de Inscripción y Cupos -->
     <div class="col-lg-4">
         <div class="card shadow-lg border-0 sticky-top rounded-4 overflow-hidden" style="top: 24px;">
-            <div class="card-header bg-dark text-white py-3 px-4 border-0 d-flex align-items-center gap-2">
+            <div class="card-header py-3 px-4 border-0 d-flex align-items-center gap-2" style="background: var(--nav-bg);">
                 <i class="bi bi-ticket-perforated-fill text-warning fs-5"></i>
                 <h5 class="fw-bold mb-0 text-white">Inscripción y Aforo</h5>
             </div>
@@ -144,7 +144,7 @@
                         <form asp-controller="Enrollments" asp-action="Enroll" method="post" onsubmit="return confirm('¿Confirmas tu inscripción en el taller @Model.Workshop.Title? Se validará disponibilidad y no solapamiento con otros talleres activos.');">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="workshopId" value="@Model.Workshop.Id" />
-                            <button type="submit" class="btn btn-warning btn-lg w-100 shadow fw-bold py-3 text-dark">
+                            <button type="submit" class="btn btn-primary btn-lg w-100 shadow fw-bold py-3">
                                 <i class="bi bi-check2-circle me-1"></i> Asegurar Mi Cupo
                             </button>
                         </form>

@@ -69,13 +69,13 @@
                     </a>
                     @if (Model.IsEmployee)
                     {
-                        <a asp-controller="Workshops" asp-action="Create" class="btn btn-outline-success btn-sm py-2">
+                        <a asp-controller="Workshops" asp-action="Create" class="btn btn-primary btn-sm py-2">
                             <i class="bi bi-plus-circle me-1"></i> Crear Nuevo Taller
                         </a>
                     }
                     else
                     {
-                        <a asp-controller="Enrollments" asp-action="Mine" class="btn btn-outline-success btn-sm py-2">
+                        <a asp-controller="Enrollments" asp-action="Mine" class="btn btn-outline-primary btn-sm py-2">
                             <i class="bi bi-bookmark-check-fill me-1"></i> Ver Mis Inscripciones
                         </a>
                     }
@@ -87,7 +87,7 @@
     <!-- Columna Derecha: Formulario de Edición de Datos -->
     <div class="col-lg-8">
         <div class="card shadow-sm border-0 overflow-hidden">
-            <div class="card-header bg-white py-3 px-4 border-bottom d-flex align-items-center gap-2">
+            <div class="card-header py-3 px-4 border-bottom d-flex align-items-center gap-2">
                 <i class="bi bi-person-gear text-primary fs-5"></i>
                 <h5 class="fw-bold mb-0 text-dark">Información de Perfil</h5>
             </div>
@@ -100,7 +100,7 @@
                         <div class="col-md-12">
                             <label asp-for="FullName" class="form-label small fw-bold text-secondary"></label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-person text-muted"></i></span>
+                                <span class="input-group-text"><i class="bi bi-person text-muted"></i></span>
                                 <input asp-for="FullName" class="form-control" placeholder="Tu nombre completo" />
                             </div>
                             <span asp-validation-for="FullName" class="text-danger small"></span>
@@ -109,16 +109,16 @@
                         <div class="col-md-6">
                             <label asp-for="Email" class="form-label small fw-bold text-secondary"></label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-envelope text-muted"></i></span>
-                                <input asp-for="Email" class="form-control bg-light" readonly disabled />
+                                <span class="input-group-text"><i class="bi bi-envelope text-muted"></i></span>
+                                <input asp-for="Email" class="form-control" readonly disabled />
                             </div>
-                            <div class="form-text small">El correo es tu identificador único de cuenta.</div>
+                            <div class="form-text small text-muted">El correo es tu identificador único de cuenta.</div>
                         </div>
 
                         <div class="col-md-6">
                             <label asp-for="PhoneNumber" class="form-label small fw-bold text-secondary"></label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="bi bi-telephone text-muted"></i></span>
+                                <span class="input-group-text"><i class="bi bi-telephone text-muted"></i></span>
                                 <input asp-for="PhoneNumber" class="form-control" placeholder="+57 300 123 4567" />
                             </div>
                             <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
@@ -129,11 +129,11 @@
                             <div class="col-md-12">
                                 <label asp-for="Specialty" class="form-label small fw-bold text-secondary"></label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light"><i class="bi bi-award text-muted"></i></span>
+                                    <span class="input-group-text"><i class="bi bi-award text-muted"></i></span>
                                     <input asp-for="Specialty" class="form-control" placeholder="Ej. Fotografía Digital, Gastronomía, Oratoria..." />
                                 </div>
                                 <span asp-validation-for="Specialty" class="text-danger small"></span>
-                                <div class="form-text small">Especialidad técnica o profesional visible para los participantes.</div>
+                                <div class="form-text small text-muted">Especialidad técnica o profesional visible para los participantes.</div>
                             </div>
                         }
                     </div>
