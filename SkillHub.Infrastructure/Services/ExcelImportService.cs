@@ -11,7 +11,51 @@ public class ExcelImportService : IExcelImportService
         var result = new List<ExcelEnrollmentRowDto>();
 
         using var workbook = new XLWorkbook(excelStream);
-        var worksheet = workbook.Worksheets.FirstOrDefault();
+
+        // 1. Target worksheet explicitly named for enrollments/inscripciones
+        var worksheet = workbook.Worksheets.FirstOrDefault(w =>
+            w.Name.Contains("Enroll", StringComparison.OrdinalIgnoreCase) ||
+            w.Name.Contains("Inscrip", StringComparison.OrdinalIgnoreCase));
+
+        // 2. Otherwise search for any worksheet whose header row contains enrollment column names
+        if (worksheet == null)
+        {
+            foreach (var sheet in workbook.Worksheets)
+            {
+                var row = sheet.FirstRowUsed();
+                if (row == null) continue;
+
+                var hasEmail = false;
+                var hasCode = false;
+
+                foreach (var cell in row.CellsUsed())
+                {
+                    var header = cell.GetString().Trim();
+                    if (header.Equals("ParticipantEmail", StringComparison.OrdinalIgnoreCase) ||
+                        header.Equals("Email", StringComparison.OrdinalIgnoreCase) ||
+                        header.Equals("Correo", StringComparison.OrdinalIgnoreCase))
+                    {
+                        hasEmail = true;
+                    }
+                    else if (header.Equals("WorkshopCode", StringComparison.OrdinalIgnoreCase) ||
+                             header.Equals("Code", StringComparison.OrdinalIgnoreCase) ||
+                             header.Equals("Codigo", StringComparison.OrdinalIgnoreCase) ||
+                             header.Equals("Taller", StringComparison.OrdinalIgnoreCase))
+                    {
+                        hasCode = true;
+                    }
+                }
+
+                if (hasEmail && hasCode)
+                {
+                    worksheet = sheet;
+                    break;
+                }
+            }
+        }
+
+        // 3. Fallback to first worksheet if none matched
+        worksheet ??= workbook.Worksheets.FirstOrDefault();
         if (worksheet == null)
             return Task.FromResult<IReadOnlyList<ExcelEnrollmentRowDto>>(result);
 

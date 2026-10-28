@@ -289,6 +289,7 @@ public static class DbSeeder
                 var nameCol = FindColumn(headerRow, "FullName", "Name", "Nombre");
                 var emailCol = FindColumn(headerRow, "Email", "Correo");
                 var specCol = FindColumn(headerRow, "Specialty", "Especialidad");
+                var passCol = FindColumn(headerRow, "Password", "Contraseña");
 
                 var lastRow = instructorsSheet.LastRowUsed()?.RowNumber() ?? 0;
                 for (var r = headerRow.RowNumber() + 1; r <= lastRow; r++)
@@ -299,6 +300,8 @@ public static class DbSeeder
                     var email = row.Cell(emailCol).GetString().Trim().ToLowerInvariant();
                     var name = row.Cell(nameCol).GetString().Trim();
                     var specialty = row.Cell(specCol).GetString().Trim();
+                    var rawPassword = passCol > 0 ? row.Cell(passCol).GetString().Trim() : null;
+                    var password = !string.IsNullOrWhiteSpace(rawPassword) ? rawPassword : DefaultEmployeePassword;
 
                     if (string.IsNullOrWhiteSpace(email)) continue;
 
@@ -316,7 +319,7 @@ public static class DbSeeder
                                 FullName = string.IsNullOrWhiteSpace(name) ? "Instructor" : name,
                                 EmailConfirmed = true
                             };
-                            await userManager.CreateAsync(user, DefaultEmployeePassword);
+                            await userManager.CreateAsync(user, password);
                             await userManager.AddToRoleAsync(user, Roles.Employee);
                         }
 
@@ -343,6 +346,7 @@ public static class DbSeeder
                 var nameCol = FindColumn(headerRow, "FullName", "Name", "Nombre");
                 var emailCol = FindColumn(headerRow, "Email", "Correo");
                 var phoneCol = FindColumn(headerRow, "PhoneNumber", "Phone", "Telefono", "Celular");
+                var passCol = FindColumn(headerRow, "Password", "Contraseña");
 
                 var lastRow = participantsSheet.LastRowUsed()?.RowNumber() ?? 0;
                 for (var r = headerRow.RowNumber() + 1; r <= lastRow; r++)
@@ -353,6 +357,8 @@ public static class DbSeeder
                     var email = row.Cell(emailCol).GetString().Trim().ToLowerInvariant();
                     var name = row.Cell(nameCol).GetString().Trim();
                     var phone = phoneCol > 0 ? row.Cell(phoneCol).GetString().Trim() : null;
+                    var rawPassword = passCol > 0 ? row.Cell(passCol).GetString().Trim() : null;
+                    var password = !string.IsNullOrWhiteSpace(rawPassword) ? rawPassword : DefaultParticipantPassword;
 
                     if (string.IsNullOrWhiteSpace(email)) continue;
 
@@ -371,7 +377,7 @@ public static class DbSeeder
                                 PhoneNumber = phone,
                                 EmailConfirmed = true
                             };
-                            await userManager.CreateAsync(user, DefaultParticipantPassword);
+                            await userManager.CreateAsync(user, password);
                             await userManager.AddToRoleAsync(user, Roles.Participant);
                         }
 
@@ -399,8 +405,8 @@ public static class DbSeeder
                 var titleCol = FindColumn(headerRow, "Title", "Titulo", "Nombre");
                 var descCol = FindColumn(headerRow, "Description", "Descripcion");
                 var instructorEmailCol = FindColumn(headerRow, "InstructorEmail", "EmailInstructor", "Instructor");
-                var startCol = FindColumn(headerRow, "StartDate", "FechaInicio", "Start");
-                var endCol = FindColumn(headerRow, "EndDate", "FechaFin", "End");
+                var startCol = FindColumn(headerRow, "StartDateTime", "StartDate", "FechaInicio", "Start");
+                var endCol = FindColumn(headerRow, "EndDateTime", "EndDate", "FechaFin", "End");
                 var capCol = FindColumn(headerRow, "Capacity", "Cupo", "CupoMaximo");
 
                 var lastRow = workshopsSheet.LastRowUsed()?.RowNumber() ?? 0;
@@ -510,6 +516,7 @@ public static class DbSeeder
             Path.Combine(AppContext.BaseDirectory, "SkillHub_Data.xlsx"),
             Path.Combine(Directory.GetCurrentDirectory(), "SeedData", "SkillHub_Data.xlsx"),
             Path.Combine(Directory.GetCurrentDirectory(), "SkillHub_Data.xlsx"),
+            Path.Combine(Directory.GetCurrentDirectory(), "SkillHub.API", "SeedData", "SkillHub_Data.xlsx"),
             Path.Combine(Directory.GetCurrentDirectory(), "..", "SkillHub.API", "SeedData", "SkillHub_Data.xlsx")
         };
 
