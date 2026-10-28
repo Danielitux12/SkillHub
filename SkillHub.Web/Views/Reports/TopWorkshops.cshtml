@@ -1,0 +1,116 @@
+@model TopWorkshopsViewModel
+@{
+    ViewData["Title"] = "Reporte de Talleres con Mayor Demanda";
+    var rank = 1;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="bi bi-bar-chart-line-fill text-primary me-2"></i>Talleres con Mayor Demanda
+        </h2>
+        <p class="text-muted mb-0">Ranking de talleres presenciales con mayor índice de inscripciones activas.</p>
+    </div>
+    <div class="mt-2 mt-md-0">
+        <form asp-action="TopWorkshops" method="get" class="d-flex align-items-center gap-2">
+            <label class="small fw-semibold text-muted text-nowrap">Mostrar top:</label>
+            <select name="count" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="5" selected="@(Model.Count == 5)">Top 5</option>
+                <option value="10" selected="@(Model.Count == 10)">Top 10</option>
+                <option value="20" selected="@(Model.Count == 20)">Top 20</option>
+            </select>
+        </form>
+    </div>
+</div>
+
+@if (Model.Workshops == null || !Model.Workshops.Any())
+{
+    <div class="card shadow-sm border-0 text-center py-5">
+        <div class="card-body">
+            <i class="bi bi-clipboard-x text-muted display-4"></i>
+            <h5 class="fw-bold text-dark mt-3">Sin estadísticas de demanda</h5>
+            <p class="text-muted">Aún no hay inscripciones registradas para calcular el ranking de talleres.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 70px;" class="text-center">#</th>
+                        <th>Taller</th>
+                        <th>Instructor</th>
+                        <th>Fecha de Inicio</th>
+                        <th style="width: 250px;">Ocupación y Cupos</th>
+                        <th class="text-center">Aforo</th>
+                        <th class="text-end pe-4">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Workshops)
+                    {
+                        var percentage = item.Capacity > 0
+                            ? (int)Math.Round((double)item.ActiveEnrollmentsCount / item.Capacity * 100)
+                            : 0;
+                        <tr>
+                            <td class="text-center">
+                                @if (rank == 1)
+                                {
+                                    <span class="badge bg-warning text-dark fs-6 rounded-pill"><i class="bi bi-trophy-fill"></i> 1</span>
+                                }
+                                else if (rank == 2)
+                                {
+                                    <span class="badge bg-secondary text-white fs-6 rounded-pill">2</span>
+                                }
+                                else if (rank == 3)
+                                {
+                                    <span class="badge bg-warning-subtle text-dark border border-warning fs-6 rounded-pill">3</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-dark border rounded-pill">@rank</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border font-monospace mb-1">@item.Code</span>
+                                <div class="fw-bold text-dark">@item.Title</div>
+                            </td>
+                            <td class="small">
+                                <i class="bi bi-person text-secondary me-1"></i>@item.InstructorName
+                            </td>
+                            <td class="small text-muted">
+                                @item.StartDate.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-between small fw-semibold mb-1">
+                                    <span>@item.ActiveEnrollmentsCount inscritos</span>
+                                    <span>@percentage%</span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar @(percentage >= 100 ? "bg-danger" : percentage >= 75 ? "bg-warning" : "bg-success")"
+                                         role="progressbar" style="width: @percentage%"
+                                         aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="text-muted small mt-1" style="font-size: 0.75rem;">
+                                    @item.AvailableSpots cupos disponibles restantes
+                                </div>
+                            </td>
+                            <td class="text-center fw-bold">
+                                @item.Capacity
+                            </td>
+                            <td class="text-end pe-4">
+                                <a asp-controller="Workshops" asp-action="Details" asp-route-id="@item.WorkshopId" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        rank++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

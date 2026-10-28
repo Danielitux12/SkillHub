@@ -107,7 +107,31 @@ public class AuthService : IAuthService
         );
     }
 
+    public async Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(request.CurrentPassword))
+            throw new BadRequestException("La contraseña actual es obligatoria.");
+
+        if (string.IsNullOrWhiteSpace(request.NewPassword))
+            throw new BadRequestException("La nueva contraseña es obligatoria.");
+
+        if (request.NewPassword != request.ConfirmPassword)
+            throw new BadRequestException("La nueva contraseña y su confirmación no coinciden.");
+
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+            throw new NotFoundException("Usuario", userId);
+
+        var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new BadRequestException($"No se pudo cambiar la contraseña: {errors}");
+        }
+    }
+
     private (string Token, DateTime ExpiresAt) GenerateJwtToken(ApplicationUser user, string role)
+
     {
         var secret = _configuration["Jwt:SecretKey"]
                      ?? _configuration["Jwt:Secret"]

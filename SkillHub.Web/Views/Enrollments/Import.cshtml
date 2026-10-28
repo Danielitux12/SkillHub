@@ -1,0 +1,114 @@
+@model ExcelImportViewModel
+@{
+    ViewData["Title"] = "Importación Masiva de Inscripciones";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white py-3 border-0">
+                <h4 class="fw-bold mb-0">
+                    <i class="bi bi-file-earmark-spreadsheet me-2"></i>Importación Masiva de Inscripciones desde Excel
+                </h4>
+                <p class="small text-white-50 mb-0">Carga por lotes inscripciones a talleres con validación automática de reglas de negocio</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info border-0 shadow-sm d-flex gap-3 mb-4">
+                    <i class="bi bi-info-circle-fill fs-3 text-primary"></i>
+                    <div class="small">
+                        <strong>Estructura esperada del archivo Excel (.xlsx):</strong>
+                        <ul class="mb-1 mt-1">
+                            <li>La primera hoja debe incluir encabezados: <code>ParticipantEmail</code> (o <code>Email</code> / <code>Correo</code>) y <code>WorkshopCode</code> (o <code>Code</code> / <code>Codigo</code>).</li>
+                            <li>Cada fila procesa una inscripción, validando que el participante exista, el taller exista y no haya iniciado, no se exceda el aforo máximo y no existan solapamientos de horario.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <form asp-action="Import" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="ExcelFile" class="form-label fw-semibold"></label>
+                        <input asp-for="ExcelFile" type="file" accept=".xlsx" class="form-control form-control-lg" />
+                        <span asp-validation-for="ExcelFile" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-controller="Workshops" asp-action="Index" class="btn btn-outline-secondary">Volver</a>
+                        <button type="submit" class="btn btn-success fw-bold px-4">
+                            <i class="bi bi-cloud-arrow-up-fill me-1"></i> Procesar Archivo Excel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @if (Model.Result != null)
+        {
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-clipboard-data text-primary me-2"></i>Resultado del Procesamiento
+                    </h5>
+                </div>
+                <div class="card-body p-4 pt-0">
+                    <div class="row g-3 mb-4 text-center">
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded border">
+                                <div class="text-muted small">Total Registros Leídos</div>
+                                <div class="fs-3 fw-bold text-dark">@Model.Result.TotalProcessed</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-success-subtle text-success rounded border border-success-subtle">
+                                <div class="small fw-semibold">Inscripciones Exitosas</div>
+                                <div class="fs-3 fw-bold">@Model.Result.SuccessfulCount</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-danger-subtle text-danger rounded border border-danger-subtle">
+                                <div class="small fw-semibold">Filas Rechazadas / Con Error</div>
+                                <div class="fs-3 fw-bold">@Model.Result.RejectedCount</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.Result.Errors.Any())
+                    {
+                        <h6 class="fw-bold text-danger mb-3">
+                            <i class="bi bi-exclamation-octagon-fill me-1"></i> Detalle de Errores por Fila:
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered align-middle">
+                                <thead class="table-danger">
+                                    <tr>
+                                        <th style="width: 80px;" class="text-center">Fila</th>
+                                        <th>Correo Participante</th>
+                                        <th>Código Taller</th>
+                                        <th>Motivo de Rechazo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var err in Model.Result.Errors)
+                                    {
+                                        <tr>
+                                            <td class="text-center fw-bold">@err.RowNumber</td>
+                                            <td><code>@err.ParticipantEmail</code></td>
+                                            <td><span class="badge bg-secondary font-monospace">@err.WorkshopCode</span></td>
+                                            <td class="text-danger small">@err.Reason</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

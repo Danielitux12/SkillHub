@@ -1,0 +1,186 @@
+@model WorkshopDetailViewModel
+@{
+    ViewData["Title"] = Model.Workshop.Title;
+    var duration = Model.Workshop.EndDate - Model.Workshop.StartDate;
+    var occupiedSpots = Model.Workshop.Capacity - Model.Workshop.AvailableSpots;
+    var occupancyPercentage = Model.Workshop.Capacity > 0
+        ? (int)Math.Round((double)occupiedSpots / Model.Workshop.Capacity * 100)
+        : 0;
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm shadow-sm">
+        <i class="bi bi-arrow-left me-1"></i> Volver al Catálogo
+    </a>
+</div>
+
+<div class="row g-4">
+    <!-- Información Principal del Taller -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 mb-4 overflow-hidden">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="workshop-code-badge fs-6 px-3 py-1">
+                        @Model.Workshop.Code
+                    </span>
+                    @if (Model.Workshop.AvailableSpots > 0)
+                    {
+                        <span class="badge bg-success-subtle text-success fs-6 border border-success-subtle px-3 py-2">
+                            <i class="bi bi-check-circle-fill me-1"></i> @Model.Workshop.AvailableSpots cupos disponibles
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger-subtle text-danger fs-6 border border-danger-subtle px-3 py-2">
+                            <i class="bi bi-x-circle-fill me-1"></i> Cupos Agotados
+                        </span>
+                    }
+                </div>
+
+                <h1 class="h2 fw-bold text-dark mb-3">@Model.Workshop.Title</h1>
+                
+                <div class="mb-4">
+                    <h6 class="text-uppercase text-muted fw-bold small mb-2 tracking-wide">Acerca de este taller</h6>
+                    <p class="text-secondary lead fs-6 mb-0" style="white-space: pre-line; line-height: 1.7;">@Model.Workshop.Description</p>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Horarios y Duración -->
+                <h6 class="text-uppercase text-muted fw-bold small mb-3">Horario y Cronograma Presencial</h6>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="text-muted small mb-1"><i class="bi bi-calendar-event text-primary me-1"></i> Inicio del Taller</div>
+                            <div class="fw-bold fs-6 text-dark">@Model.Workshop.StartDate.ToString("dddd, dd MMMM yyyy")</div>
+                            <div class="text-primary small fw-semibold">@Model.Workshop.StartDate.ToString("HH:mm") UTC</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <div class="text-muted small mb-1"><i class="bi bi-calendar-check text-primary me-1"></i> Finalización</div>
+                            <div class="fw-bold fs-6 text-dark">@Model.Workshop.EndDate.ToString("dddd, dd MMMM yyyy")</div>
+                            <div class="text-primary small fw-semibold">@Model.Workshop.EndDate.ToString("HH:mm") UTC</div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="p-3 bg-primary-subtle text-primary rounded-3 border border-primary-subtle d-flex align-items-center gap-2 small">
+                            <i class="bi bi-hourglass-split fs-5"></i>
+                            <div>
+                                <strong>Duración Total:</strong> @((int)duration.TotalHours) horas y @duration.Minutes minutos de capacitación intensiva práctica presencial.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructor Responsable -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3 px-4 border-0">
+                <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-person-badge text-primary me-2"></i>Instructor Asignado</h5>
+            </div>
+            <div class="card-body pt-0 px-4 pb-4">
+                <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3 border">
+                    <div class="instructor-avatar" style="width: 52px; height: 52px; font-size: 1.4rem;">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1">@Model.Workshop.InstructorName</h5>
+                        <div class="text-muted small mb-1"><i class="bi bi-award text-warning me-1"></i> Especialidad: <strong>@Model.Workshop.InstructorSpecialty</strong></div>
+                        <div class="text-muted small"><i class="bi bi-envelope text-secondary me-1"></i> @Model.Workshop.InstructorEmail</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra Lateral de Inscripción y Cupos -->
+    <div class="col-lg-4">
+        <div class="card shadow-lg border-0 sticky-top rounded-4 overflow-hidden" style="top: 24px;">
+            <div class="card-header bg-dark text-white py-3 px-4 border-0 d-flex align-items-center gap-2">
+                <i class="bi bi-ticket-perforated-fill text-warning fs-5"></i>
+                <h5 class="fw-bold mb-0 text-white">Inscripción y Aforo</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between small fw-bold mb-2">
+                        <span class="text-secondary">Ocupación Actual:</span>
+                        <span class="text-dark">@occupiedSpots / @Model.Workshop.Capacity (@occupancyPercentage%)</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar @(occupancyPercentage >= 100 ? "bg-danger" : occupancyPercentage > 75 ? "bg-warning" : "bg-primary")"
+                             role="progressbar" style="width: @occupancyPercentage%"
+                             aria-valuenow="@occupancyPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-light rounded-3 border mb-4 text-center">
+                    <div class="text-muted small text-uppercase fw-semibold mb-1">Cupos Disponibles</div>
+                    <div class="display-5 fw-extrabold @(Model.Workshop.AvailableSpots > 0 ? "text-success" : "text-danger")">
+                        @Model.Workshop.AvailableSpots
+                    </div>
+                    <div class="small text-muted">de un aforo total de @Model.Workshop.Capacity participantes</div>
+                </div>
+
+                <!-- Botones y Acciones según Rol -->
+                @if (User.Identity?.IsAuthenticated == true && User.IsParticipant())
+                {
+                    if (Model.IsParticipantEnrolled)
+                    {
+                        <div class="alert alert-success d-flex align-items-center mb-3 rounded-3" role="alert">
+                            <i class="bi bi-check-circle-fill fs-4 me-2"></i>
+                            <div>
+                                <strong>¡Ya estás inscrito!</strong><br />
+                                Tienes tu cupo asegurado para este taller.
+                            </div>
+                        </div>
+                        <a asp-controller="Enrollments" asp-action="Mine" class="btn btn-outline-success w-100 shadow-sm">
+                            <i class="bi bi-bookmark-check me-1"></i> Ir a Mis Inscripciones
+                        </a>
+                    }
+                    else if (Model.CanEnroll)
+                    {
+                        <form asp-controller="Enrollments" asp-action="Enroll" method="post" onsubmit="return confirm('¿Confirmas tu inscripción en el taller @Model.Workshop.Title? Se validará disponibilidad y no solapamiento con otros talleres activos.');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="workshopId" value="@Model.Workshop.Id" />
+                            <button type="submit" class="btn btn-warning btn-lg w-100 shadow fw-bold py-3 text-dark">
+                                <i class="bi bi-check2-circle me-1"></i> Asegurar Mi Cupo
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mb-0 rounded-3" role="alert">
+                            <i class="bi bi-info-circle-fill me-1"></i>
+                            @Model.CantEnrollReason
+                        </div>
+                    }
+                }
+                else if (User.Identity?.IsAuthenticated == true && User.IsEmployee())
+                {
+                    <div class="alert alert-info small mb-3 rounded-3">
+                        <i class="bi bi-shield-lock-fill me-1"></i> Visualizando con perfil de <strong>Staff / Instructor</strong>.
+                    </div>
+                    <a asp-action="Enrollments" asp-route-id="@Model.Workshop.Id" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="bi bi-people me-1"></i> Ver Inscritos (@occupiedSpots)
+                    </a>
+                }
+                else
+                {
+                    <div class="alert alert-light border small mb-3 rounded-3">
+                        <i class="bi bi-person-lock me-1"></i> Inicia sesión como participante para reservar tu cupo en este taller.
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Details", "Workshops", new { id = Model.Workshop.Id })" class="btn btn-primary py-2 shadow-sm">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión para Inscribirte
+                        </a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-secondary btn-sm py-2">
+                            ¿No tienes cuenta? Regístrate gratis
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -30,7 +30,10 @@ public static class DbSeeder
         // 2. Seed Default Fixed Employee
         await EnsureDefaultEmployeeAsync(context, userManager);
 
-        // 3. Seed from Excel if provided and database is empty
+        // 3. Seed Sample Data (3 items for each entity: Instructors, Participants, Workshops, Enrollments)
+        await EnsureSampleDataAsync(context, userManager, logger);
+
+        // 4. Seed from Excel if provided and database is empty
         var resolvedPath = ResolveExcelPath(excelPath);
         if (!string.IsNullOrEmpty(resolvedPath) && File.Exists(resolvedPath))
         {
@@ -80,6 +83,192 @@ public static class DbSeeder
                 }
             }
         }
+    }
+
+    private static async Task EnsureSampleDataAsync(
+        SkillHubDbContext context,
+        UserManager<ApplicationUser> userManager,
+        ILogger? logger)
+    {
+        // 1. Ensure 3 Instructors (including the default staff employee)
+        var additionalInstructors = new[]
+        {
+            (Email: "laura.gomez@skillhub.com", Name: "Laura Gómez", Specialty: "Gastronomía y Pastelería Artesanal"),
+            (Email: "andres.torres@skillhub.com", Name: "Andrés Torres", Specialty: "Oratoria y Comunicación Efectiva")
+        };
+
+        foreach (var inst in additionalInstructors)
+        {
+            var user = await userManager.FindByEmailAsync(inst.Email);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = inst.Email,
+                    Email = inst.Email,
+                    FullName = inst.Name,
+                    EmailConfirmed = true
+                };
+                var result = await userManager.CreateAsync(user, DefaultEmployeePassword);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(user, Roles.Employee);
+                }
+            }
+
+            var instructorExists = await context.Instructors.AnyAsync(i => i.Email == inst.Email);
+            if (!instructorExists)
+            {
+                var instructor = new Instructor(
+                    fullName: inst.Name,
+                    email: inst.Email,
+                    specialty: inst.Specialty,
+                    id: user.Id
+                );
+                await context.Instructors.AddAsync(instructor);
+            }
+        }
+        await context.SaveChangesAsync();
+
+        // 2. Ensure 3 Participants
+        var sampleParticipants = new[]
+        {
+            (Email: "juan.perez@skillhub.com", Name: "Juan Pérez", Phone: "+57 300 123 4567"),
+            (Email: "maria.rodriguez@skillhub.com", Name: "María Rodríguez", Phone: "+57 310 987 6543"),
+            (Email: "pedro.gomez@skillhub.com", Name: "Pedro Gómez", Phone: "+57 320 555 8899")
+        };
+
+        foreach (var part in sampleParticipants)
+        {
+            var user = await userManager.FindByEmailAsync(part.Email);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = part.Email,
+                    Email = part.Email,
+                    FullName = part.Name,
+                    PhoneNumber = part.Phone,
+                    EmailConfirmed = true
+                };
+                var result = await userManager.CreateAsync(user, DefaultParticipantPassword);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(user, Roles.Participant);
+                }
+            }
+
+            var participantExists = await context.Participants.AnyAsync(p => p.Email == part.Email);
+            if (!participantExists)
+            {
+                var participant = new Participant(
+                    fullName: part.Name,
+                    email: part.Email,
+                    phoneNumber: part.Phone,
+                    id: user.Id
+                );
+                await context.Participants.AddAsync(participant);
+            }
+        }
+        await context.SaveChangesAsync();
+
+        // 3. Ensure 3 Workshops
+        var instructor1 = await context.Instructors.FirstOrDefaultAsync(i => i.Email == DefaultEmployeeEmail);
+        var instructor2 = await context.Instructors.FirstOrDefaultAsync(i => i.Email == "laura.gomez@skillhub.com");
+        var instructor3 = await context.Instructors.FirstOrDefaultAsync(i => i.Email == "andres.torres@skillhub.com");
+
+        if (instructor1 != null && instructor2 != null && instructor3 != null)
+        {
+            var now = DateTime.UtcNow;
+
+            var sampleWorkshops = new[]
+            {
+                (
+                    Code: "FOT-101",
+                    Title: "Fotografía Urbana e Iluminación Natural",
+                    Description: "Aprende a capturar la esencia de la ciudad utilizando luz natural, técnicas de encuadre y composición para fotografía de calle.",
+                    InstructorId: instructor1.Id,
+                    StartDate: DateTime.SpecifyKind(now.AddDays(5).Date.AddHours(9), DateTimeKind.Utc),
+                    EndDate: DateTime.SpecifyKind(now.AddDays(5).Date.AddHours(13), DateTimeKind.Utc),
+                    Capacity: 15
+                ),
+                (
+                    Code: "COC-201",
+                    Title: "Cocina Mediterránea y Pastas Frescas",
+                    Description: "Taller gastronómico presencial donde prepararás masas tradicionales desde cero, salsas emblemáticas y técnicas de emplatado.",
+                    InstructorId: instructor2.Id,
+                    StartDate: DateTime.SpecifyKind(now.AddDays(8).Date.AddHours(14), DateTimeKind.Utc),
+                    EndDate: DateTime.SpecifyKind(now.AddDays(8).Date.AddHours(18), DateTimeKind.Utc),
+                    Capacity: 12
+                ),
+                (
+                    Code: "ORA-301",
+                    Title: "Oratoria de Alto Impacto y Storytelling",
+                    Description: "Domina el manejo de la voz, expresión corporal y técnicas de estructuración de discursos para presentaciones efectivas.",
+                    InstructorId: instructor3.Id,
+                    StartDate: DateTime.SpecifyKind(now.AddDays(12).Date.AddHours(10), DateTimeKind.Utc),
+                    EndDate: DateTime.SpecifyKind(now.AddDays(12).Date.AddHours(14), DateTimeKind.Utc),
+                    Capacity: 20
+                )
+            };
+
+            foreach (var w in sampleWorkshops)
+            {
+                var workshopExists = await context.Workshops.AnyAsync(wk => wk.Code == w.Code);
+                if (!workshopExists)
+                {
+                    var workshop = new Workshop(
+                        code: w.Code,
+                        title: w.Title,
+                        description: w.Description,
+                        instructorId: w.InstructorId,
+                        startDate: w.StartDate,
+                        endDate: w.EndDate,
+                        capacity: w.Capacity,
+                        referenceTime: now
+                    );
+                    await context.Workshops.AddAsync(workshop);
+                }
+            }
+            await context.SaveChangesAsync();
+        }
+
+        // 4. Ensure 3 Enrollments
+        var juan = await context.Participants.FirstOrDefaultAsync(p => p.Email == "juan.perez@skillhub.com");
+        var maria = await context.Participants.FirstOrDefaultAsync(p => p.Email == "maria.rodriguez@skillhub.com");
+        var workshopFot = await context.Workshops.FirstOrDefaultAsync(w => w.Code == "FOT-101");
+        var workshopCoc = await context.Workshops.FirstOrDefaultAsync(w => w.Code == "COC-201");
+
+        if (juan != null && maria != null && workshopFot != null && workshopCoc != null)
+        {
+            var enrollmentsToSeed = new[]
+            {
+                (ParticipantId: juan.Id, WorkshopId: workshopFot.Id, Date: DateTime.SpecifyKind(DateTime.UtcNow.AddDays(-2), DateTimeKind.Utc)),
+                (ParticipantId: maria.Id, WorkshopId: workshopFot.Id, Date: DateTime.SpecifyKind(DateTime.UtcNow.AddDays(-1), DateTimeKind.Utc)),
+                (ParticipantId: maria.Id, WorkshopId: workshopCoc.Id, Date: DateTime.SpecifyKind(DateTime.UtcNow.AddHours(-12), DateTimeKind.Utc))
+            };
+
+            foreach (var item in enrollmentsToSeed)
+            {
+                var enrollmentExists = await context.Enrollments.AnyAsync(e =>
+                    e.ParticipantId == item.ParticipantId && e.WorkshopId == item.WorkshopId);
+
+                if (!enrollmentExists)
+                {
+                    var enrollment = new Enrollment(
+                        participantId: item.ParticipantId,
+                        workshopId: item.WorkshopId,
+                        enrollmentDate: item.Date
+                    );
+                    await context.Enrollments.AddAsync(enrollment);
+                }
+            }
+            await context.SaveChangesAsync();
+        }
+
+        logger?.LogInformation("Sample seed data (3 items per management entity) created successfully.");
     }
 
     private static async Task SeedFromExcelAsync(

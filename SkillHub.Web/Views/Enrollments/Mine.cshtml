@@ -1,0 +1,117 @@
+@model MyEnrollmentsViewModel
+@{
+    ViewData["Title"] = "Mis Inscripciones";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="bi bi-bookmark-check-fill text-primary me-2"></i>Mis Inscripciones a Talleres
+        </h2>
+        <p class="text-muted mb-0">Consulta tus talleres asignados, descarga tus constancias de inscripción o cancela tu cupo si no puedes asistir.</p>
+    </div>
+    <div class="mt-2 mt-md-0">
+        <a asp-controller="Workshops" asp-action="Index" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-search me-1"></i> Explorar Más Talleres
+        </a>
+    </div>
+</div>
+
+@if (Model.Enrollments == null || !Model.Enrollments.Any())
+{
+    <div class="card shadow-sm border-0 text-center py-5">
+        <div class="card-body">
+            <i class="bi bi-journal-x display-3 text-muted mb-3"></i>
+            <h4 class="fw-bold text-dark">No tienes inscripciones activas</h4>
+            <p class="text-muted">Aún no te has inscrito en ningún taller presencial de SkillHub.</p>
+            <a asp-controller="Workshops" asp-action="Index" class="btn btn-primary mt-2">
+                <i class="bi bi-grid-fill me-1"></i> Ver Catálogo de Talleres
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Taller</th>
+                        <th>Horario y Fechas</th>
+                        <th>Fecha de Inscripción</th>
+                        <th>Estado</th>
+                        <th class="text-end pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var enrollment in Model.Enrollments)
+                    {
+                        var hasStarted = enrollment.StartDate <= DateTime.UtcNow;
+                        <tr>
+                            <td class="ps-4">
+                                <span class="badge bg-light text-dark border font-monospace mb-1">@enrollment.WorkshopCode</span>
+                                <div class="fw-bold text-dark">@enrollment.WorkshopTitle</div>
+                            </td>
+                            <td class="small">
+                                <div><i class="bi bi-calendar-event text-secondary me-1"></i>@enrollment.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
+                                <div class="text-muted"><i class="bi bi-clock text-secondary me-1"></i>Hasta: @enrollment.EndDate.ToString("dd/MM/yyyy HH:mm")</div>
+                            </td>
+                            <td class="small text-muted">
+                                @enrollment.EnrollmentDate.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td>
+                                @if (enrollment.Status == "Active")
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                        <i class="bi bi-check-circle me-1"></i>Activa
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">
+                                        <i class="bi bi-x-circle me-1"></i>Cancelada
+                                    </span>
+                                    @if (enrollment.CancelledAt.HasValue)
+                                    {
+                                        <div class="text-muted small" style="font-size: 0.75rem;">el @enrollment.CancelledAt.Value.ToString("dd/MM/yyyy HH:mm")</div>
+                                    }
+                                }
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group">
+                                    @if (enrollment.Status == "Active")
+                                    {
+                                        <a asp-action="Certificate" asp-route-id="@enrollment.Id" class="btn btn-sm btn-outline-primary" title="Descargar Constancia en PDF">
+                                            <i class="bi bi-file-earmark-pdf me-1"></i> Constancia PDF
+                                        </a>
+
+                                        @if (!hasStarted)
+                                        {
+                                            <form asp-action="Cancel" asp-route-id="@enrollment.Id" method="post" class="d-inline" onsubmit="return confirm('¿Estás seguro de cancelar tu inscripción en @enrollment.WorkshopTitle? Esta acción liberará tu cupo.');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-danger ms-1" title="Cancelar mi cupo">
+                                                    <i class="bi bi-x-circle me-1"></i> Cancelar
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light text-muted border ms-1" title="El taller ya inició, no se puede cancelar">
+                                                En curso / Finalizado
+                                            </span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small fst-italic">Cupo liberado</span>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

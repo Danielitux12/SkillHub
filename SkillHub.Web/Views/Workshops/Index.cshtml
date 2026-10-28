@@ -1,0 +1,161 @@
+@model WorkshopIndexViewModel
+@{
+    ViewData["Title"] = "Catálogo de Talleres";
+}
+
+<!-- Encabezado de la página -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-2 px-3 py-1">
+            <i class="bi bi-mortarboard me-1"></i> Formación Presencial
+        </span>
+        <h2 class="fw-bold text-dark mb-1">
+            Catálogo de Talleres
+        </h2>
+        <p class="text-muted mb-0">Explora los talleres activos, revisa los cupos disponibles e inscríbete al instante.</p>
+    </div>
+    @if (User.Identity?.IsAuthenticated == true && User.IsEmployee())
+    {
+        <div class="mt-3 mt-md-0">
+            <a asp-action="Create" class="btn btn-primary shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Publicar Nuevo Taller
+            </a>
+        </div>
+    }
+</div>
+
+<!-- Barra de Búsqueda (Sin el filtro que no funcionaba) -->
+<div class="card shadow-sm border-0 mb-4 filter-card">
+    <div class="card-body p-2 p-md-3">
+        <form asp-action="Index" method="get" class="row g-2 align-items-center">
+            <div class="col-12 col-md-9 col-lg-10">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" 
+                           name="search" 
+                           value="@Model.SearchTerm" 
+                           class="form-control border-start-0 ps-0" 
+                           placeholder="Buscar por título, código (ej. FOT-101), instructor o temática..." 
+                           autocomplete="off" />
+                </div>
+            </div>
+            <div class="col-12 col-md-3 col-lg-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100 shadow-sm">
+                    <i class="bi bi-search me-1"></i> Buscar
+                </button>
+                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary" title="Limpiar búsqueda">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Listado de Talleres -->
+@if (Model.Workshops == null || !Model.Workshops.Any())
+{
+    <div class="card shadow-sm border-0 text-center py-5">
+        <div class="card-body py-5">
+            <div class="d-inline-flex p-3 rounded-circle bg-light text-muted mb-3 border">
+                <i class="bi bi-calendar-x display-4 text-primary opacity-75"></i>
+            </div>
+            <h4 class="fw-bold text-dark">No se encontraron talleres</h4>
+            <p class="text-muted col-md-6 mx-auto">No hay resultados que coincidan con tu término de búsqueda. Prueba con otra palabra clave o restablece la búsqueda.</p>
+            <a asp-action="Index" class="btn btn-outline-primary btn-sm mt-2 px-3">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Ver todos los talleres
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var workshop in Model.Workshops)
+        {
+            var occupied = workshop.Capacity - workshop.AvailableSpots;
+            var occupancyPct = workshop.Capacity > 0 ? (int)Math.Round((double)occupied / workshop.Capacity * 100) : 0;
+            var duration = workshop.EndDate - workshop.StartDate;
+
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 workshop-card">
+                    <div class="card-body d-flex flex-column p-4">
+                        <!-- Header de la tarjeta -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="workshop-code-badge">
+                                @workshop.Code
+                            </span>
+                            @if (workshop.AvailableSpots > 0)
+                            {
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                    <i class="bi bi-check-circle-fill me-1"></i>@workshop.AvailableSpots cupos libres
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                    <i class="bi bi-x-circle-fill me-1"></i>Agotado
+                                </span>
+                            }
+                        </div>
+
+                        <!-- Título y Descripción -->
+                        <h5 class="card-title fw-bold text-dark mb-2">
+                            <a asp-action="Details" asp-route-id="@workshop.Id" class="text-decoration-none text-dark hover-primary">
+                                @workshop.Title
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted small flex-grow-1 mb-3" style="min-height: 42px;">
+                            @(workshop.Description.Length > 110 ? workshop.Description.Substring(0, 107) + "..." : workshop.Description)
+                        </p>
+
+                        <!-- Barra de ocupación de aforo -->
+                        <div class="mb-3 p-2 bg-light rounded-3 border">
+                            <div class="d-flex justify-content-between small text-muted mb-1">
+                                <span><i class="bi bi-people text-secondary me-1"></i>Aforo</span>
+                                <span class="fw-bold text-dark">@occupied / @workshop.Capacity inscritos</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar @(occupancyPct >= 100 ? "bg-danger" : occupancyPct > 70 ? "bg-warning" : "bg-primary")" 
+                                     style="width: @occupancyPct%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Meta Información: Instructor y Horario -->
+                        <div class="border-top pt-3 text-muted small">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="instructor-avatar" style="width: 32px; height: 32px; font-size: 0.8rem; border-radius: 8px;">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <div class="text-truncate">
+                                    <span class="text-muted d-block" style="font-size: 0.72rem; line-height: 1;">Instructor</span>
+                                    <strong class="text-dark">@workshop.InstructorName</strong>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 text-secondary mb-1">
+                                <i class="bi bi-calendar-event text-primary"></i>
+                                <span>@workshop.StartDate.ToString("dd MMM yyyy") &bull; @workshop.StartDate.ToString("HH:mm") - @workshop.EndDate.ToString("HH:mm") UTC</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 text-secondary">
+                                <i class="bi bi-clock-history text-primary"></i>
+                                <span>Duración: @((int)duration.TotalHours)h @(duration.Minutes > 0 ? duration.Minutes + "m" : "") intensivo</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer con Botón de Acción -->
+                    <div class="card-footer bg-white border-0 px-4 pb-4 pt-0">
+                        <a asp-action="Details" asp-route-id="@workshop.Id" class="btn btn-outline-primary w-100 d-flex justify-content-between align-items-center">
+                            <span>Ver Información y Cupo</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

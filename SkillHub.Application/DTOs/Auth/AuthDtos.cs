@@ -20,3 +20,10 @@ public record AuthResponse(
     string Role,
     DateTime ExpiresAt
 );
+
+public record ChangePasswordRequest(
+    string CurrentPassword,
+    string NewPassword,
+    string ConfirmPassword
+);
+

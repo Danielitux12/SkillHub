@@ -1,0 +1,161 @@
+@{
+    ViewData["Title"] = "Plataforma de Talleres Presenciales";
+}
+
+<!-- Hero Section Principal -->
+<div class="hero-banner mb-5">
+    <div class="row align-items-center position-relative" style="z-index: 2;">
+        <div class="col-lg-8">
+            <div class="hero-pill mb-3">
+                <i class="bi bi-patch-check-fill text-warning"></i>
+                <span>Gestión Profesional de Formación Presencial</span>
+            </div>
+            <h1 class="display-4 fw-extrabold text-white mb-3" style="line-height: 1.15;">
+                Aprende, experimenta y domina nuevas habilidades
+            </h1>
+            <p class="fs-5 text-light opacity-90 col-lg-10 mb-4" style="line-height: 1.6;">
+                SkillHub conecta instructores y participantes en talleres cortos de alto impacto. Control de cupos en tiempo real, prevención de conflictos de horario y certificados oficiales en PDF.
+            </p>
+            <div class="d-flex flex-wrap gap-3 pt-2">
+                <a asp-controller="Workshops" asp-action="Index" class="btn btn-warning btn-lg px-4 shadow">
+                    <i class="bi bi-grid-fill me-2"></i> Explorar Catálogo
+                </a>
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-person-plus me-2"></i> Crear Cuenta Gratis
+                    </a>
+                }
+                else if (User.IsParticipant())
+                {
+                    <a asp-controller="Enrollments" asp-action="Mine" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-bookmark-check-fill me-2"></i> Mis Inscripciones
+                    </a>
+                }
+                else if (User.IsEmployee())
+                {
+                    <a asp-controller="Workshops" asp-action="Create" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-plus-circle-fill me-2"></i> Publicar Taller
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="col-lg-4 text-center d-none d-lg-block">
+            <div class="position-relative d-inline-block">
+                <div class="p-5 rounded-circle bg-white bg-opacity-10 backdrop-blur border border-white border-opacity-20 shadow-lg">
+                    <i class="bi bi-mortarboard-fill text-warning display-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas Rápidas -->
+<div class="row g-3 mb-5">
+    <div class="col-md-4">
+        <div class="card p-3 border-0 shadow-sm text-center">
+            <div class="text-primary fs-3 fw-bold mb-1">100%</div>
+            <div class="text-muted small fw-semibold text-uppercase">Presencial y Práctico</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 border-0 shadow-sm text-center">
+            <div class="text-success fs-3 fw-bold mb-1">En Tiempo Real</div>
+            <div class="text-muted small fw-semibold text-uppercase">Control de Aforo y Cupos</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 border-0 shadow-sm text-center">
+            <div class="text-info fs-3 fw-bold mb-1">PDF QuestPDF</div>
+            <div class="text-muted small fw-semibold text-uppercase">Constancias con Validación</div>
+        </div>
+    </div>
+</div>
+
+<!-- Pilares del Sistema y Reglas de Dominio -->
+<div class="mb-5">
+    <div class="text-center mb-4">
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 mb-2">
+            Arquitectura Limpia &bull; Domain-Driven
+        </span>
+        <h3 class="fw-bold text-dark">Reglas de Negocio Estrictas y Confiables</h3>
+        <p class="text-muted col-md-8 mx-auto">La plataforma implementa un núcleo de dominio que protege la integridad operativa de cada taller.</p>
+    </div>
+
+    <div class="row g-4 row-cols-1 row-cols-lg-3">
+        <div class="col">
+            <div class="feature-box h-100">
+                <div class="feature-icon-circle feature-icon-indigo">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-2">Aforo y Solapamiento</h5>
+                <p class="text-muted small mb-0" style="line-height: 1.6;">
+                    Garantiza cupo exacto y rechaza inscripciones duplicadas o en talleres con cruces de fecha y hora para el mismo participante.
+                </p>
+            </div>
+        </div>
+        <div class="col">
+            <div class="feature-box h-100">
+                <div class="feature-icon-circle feature-icon-emerald">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-2">Constancias en PDF</h5>
+                <p class="text-muted small mb-0" style="line-height: 1.6;">
+                    Generación dinámica e instantánea de certificados de asistencia con motor QuestPDF, listos para descargar desde el panel de usuario.
+                </p>
+            </div>
+        </div>
+        <div class="col">
+            <div class="feature-box h-100">
+                <div class="feature-icon-circle feature-icon-cyan">
+                    <i class="bi bi-file-earmark-spreadsheet"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-2">Carga Masiva Excel</h5>
+                <p class="text-muted small mb-0" style="line-height: 1.6;">
+                    Importación ágil de participantes desde hojas de cálculo (.xlsx) con ClosedXML para coordinadores y personal administrativo.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tarjeta de Credenciales de Prueba -->
+<div class="card border-0 shadow-sm overflow-hidden mb-4">
+    <div class="card-header bg-dark text-white py-3 px-4 d-flex justify-content-between align-items-center">
+        <div class="fw-bold d-flex align-items-center gap-2">
+            <i class="bi bi-key-fill text-warning"></i>
+            <span>Credenciales Semilla para Pruebas en Vivo</span>
+        </div>
+        <span class="badge bg-secondary font-monospace">Entorno Local</span>
+    </div>
+    <div class="card-body p-4 bg-white">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-light border">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-primary"><i class="bi bi-shield-lock-fill me-1"></i> Rol Empleado / Staff</span>
+                        <span class="badge bg-primary text-white">Administrador</span>
+                    </div>
+                    <p class="text-muted small mb-2">Permite crear nuevos talleres, ver participantes y descargar reportes.</p>
+                    <div class="p-2 bg-white rounded border small font-monospace">
+                        <div><strong>Email:</strong> <code>empleado@skillhub.com</code></div>
+                        <div><strong>Password:</strong> <code>Password123!</code></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3 rounded-3 bg-light border">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-success"><i class="bi bi-person-check-fill me-1"></i> Rol Participante</span>
+                        <span class="badge bg-success text-white">Estudiante</span>
+                    </div>
+                    <p class="text-muted small mb-2">Permite inscribirse a talleres, cancelar cupos y descargar constancias en PDF.</p>
+                    <div class="p-2 bg-white rounded border small font-monospace">
+                        <div><strong>Email:</strong> <code>maria.rodriguez@skillhub.com</code> (o registrar nuevo)</div>
+                        <div><strong>Password:</strong> <code>Password123!</code></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

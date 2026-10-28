@@ -1,0 +1,107 @@
+@model WorkshopEnrollmentsViewModel
+@{
+    ViewData["Title"] = $"Participantes de {Model.Workshop.Code}";
+    var activeCount = Model.Enrollments.Count(e => e.Status == "Active");
+    var cancelledCount = Model.Enrollments.Count(e => e.Status == "Cancelled");
+}
+
+<div class="mb-3">
+    <a asp-action="Details" asp-route-id="@Model.Workshop.Id" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Volver al Taller
+    </a>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <span class="badge bg-primary font-monospace mb-2">@Model.Workshop.Code</span>
+                <h3 class="fw-bold mb-1">@Model.Workshop.Title</h3>
+                <p class="text-muted mb-0 small">
+                    <i class="bi bi-person-badge me-1"></i>Instructor: <strong>@Model.Workshop.InstructorName</strong> &bull;
+                    <i class="bi bi-calendar me-1"></i>@Model.Workshop.StartDate.ToString("dd/MM/yyyy HH:mm") a @Model.Workshop.EndDate.ToString("dd/MM/yyyy HH:mm")
+                </p>
+            </div>
+            <div class="d-flex gap-2 mt-3 mt-md-0">
+                <span class="badge bg-success-subtle text-success fs-6 border border-success-subtle p-2">
+                    Activos: @activeCount / @Model.Workshop.Capacity
+                </span>
+                <span class="badge bg-secondary-subtle text-secondary fs-6 border border-secondary-subtle p-2">
+                    Cancelados: @cancelledCount
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3 border-0">
+        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-people-fill text-primary me-2"></i>Listado de Inscripciones</h5>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Enrollments == null || !Model.Enrollments.Any())
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-inbox text-muted display-4"></i>
+                <p class="text-muted mt-2">Aún no hay inscripciones registradas en este taller.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Participante</th>
+                            <th>Correo Electrónico</th>
+                            <th>Fecha de Inscripción</th>
+                            <th>Estado</th>
+                            <th class="text-end pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var enrollment in Model.Enrollments)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-semibold">@enrollment.ParticipantName</td>
+                                <td>@enrollment.ParticipantEmail</td>
+                                <td class="small text-muted">@enrollment.EnrollmentDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    @if (enrollment.Status == "Active")
+                                    {
+                                        <span class="badge bg-success">Activa</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Cancelada</span>
+                                        @if (!string.IsNullOrEmpty(enrollment.CancelledBy))
+                                        {
+                                            <div class="small text-muted" style="font-size: 0.75rem;">por @enrollment.CancelledBy</div>
+                                        }
+                                    }
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group btn-group-sm">
+                                        @if (enrollment.Status == "Active")
+                                        {
+                                            <a asp-controller="Enrollments" asp-action="Certificate" asp-route-id="@enrollment.Id" class="btn btn-outline-primary" title="Descargar Constancia PDF">
+                                                <i class="bi bi-file-earmark-pdf"></i>
+                                            </a>
+                                            <form asp-controller="Enrollments" asp-action="Cancel" asp-route-id="@enrollment.Id" method="post" class="d-inline" onsubmit="return confirm('¿Está seguro de cancelar administrativamente la inscripción de este participante?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="returnUrl" value="@Url.Action("Enrollments", "Workshops", new { id = Model.Workshop.Id })" />
+                                                <button type="submit" class="btn btn-outline-danger" title="Cancelar inscripción">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
