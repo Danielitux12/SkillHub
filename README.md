@@ -63,7 +63,7 @@ SkillHub/
 - **`SkillHub.API`**:
   - **RESTful Controllers**: HTTP endpoints for authentication (registration, login, change password), workshops, enrollments, and operational reports.
   - **Security & Authorization**: JWT Bearer token authentication with role-based policies (`EmployeeOnly`, `ParticipantOnly`).
-  - **Exception Handling**: Global `ExceptionHandlingMiddleware` translating domain and application exceptions into standard RFC 7807 Problem Details HTTP error payloads.
+  - **Exception Handling**: Global ExceptionHandlingMiddleware translating domain and application exceptions into consistent JSON error responses (`{ statusCode, message }`).
   - **OpenAPI / Swagger**: Configured with bearer token authorization for interactive API exploration.
   - **Lifecycle Automation**: Automatic database migration and seed execution upon application startup.
 
@@ -104,7 +104,7 @@ Base route: `/api/v1`
 |---|---|---|---|
 | `POST` | `/api/v1/enrollments` | `ParticipantOnly` | Enroll the authenticated participant into an eligible workshop |
 | `GET` | `/api/v1/enrollments/mine` | `ParticipantOnly` | Retrieve all enrollments associated with the authenticated participant |
-| `PATCH` | `/api/v1/enrollments/{id}/cancel` | `ParticipantOnly` | Cancel an active enrollment (enforces 24-hour advance cancellation rule) |
+| `PATCH` | `/api/v1/enrollments/{id}/cancel` | `Authenticated (owner participant or employee)` | Cancel an active enrollment (enforces 24-hour advance cancellation rule) |
 | `POST` | `/api/v1/enrollments/import` | `EmployeeOnly` | Bulk import enrollments from an uploaded Excel file (`.xlsx`) |
 | `GET` | `/api/v1/enrollments/{id}/certificate` | Authenticated | Download the generated PDF participation certificate |
 
@@ -189,3 +189,7 @@ The platform is pre-seeded with the following staff credentials for administrati
 
 * **Name**: Daniel Isaac Jaraba
 * **Repository**: SkillHub
+* **Full Name**: Daniel Isaac Jaraba 
+* **Clan**: C# 
+* **Email**: danielillo3609@gmail.com 
+* **ID Document**: 1043141337
